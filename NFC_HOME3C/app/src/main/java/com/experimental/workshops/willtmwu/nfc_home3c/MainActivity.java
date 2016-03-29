@@ -2,6 +2,10 @@ package com.experimental.workshops.willtmwu.nfc_home3c;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,6 +27,9 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private PendingIntent nfcPendingIntent;
+    private IntentFilter[] intentFiltersArray;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +48,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this,
+                drawer,
+                toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close){
+            /*public void onDrawerClosed(View view) {
+                getActionBar().setTitle("HOME3C");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle("HOME3C");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }*/
+        };
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -49,9 +70,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null){
-            navigationView.set
+            Fragment fragment = new MainFragment();
+            Bundle args = new Bundle();
+            args.putString(MainFragment.ARG_PLANET_NUMBER, "Main");
+
+            fragment.setArguments(args);
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            navigationView.setCheckedItem(0);
         }
 
+        Intent nfcIntent = new Intent(this, getClass());
+        nfcIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        nfcPendingIntent = PendingIntent.getActivity(this, 0, nfcIntent, 0);
+        IntentFilter tagIntentFilter =
+        new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        try {
+            tagIntentFilter.addDataType("text/plain");
+            intentFiltersArray = new IntentFilter[]{tagIntentFilter};
+        }
+        catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    protected void onResume() {
+        super.onResume();
+        nfcAdapt.enableForegroundDispatch(
+                this,
+                nfcPendingIntent,
+                intentFiltersArray,
+                null);
+        handleIntent(getIntent());
     }
 
     @Override
@@ -89,42 +139,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        Fragment fragment = new MainFragment();
-        Bundle args = new Bundle();
-        //args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-            args.putString(MainFragment.ARG_PLANET_NUMBER, "Slide");
-        } else if (id == R.id.nav_manage) {
-            args.putString(MainFragment.ARG_PLANET_NUMBER, "Manage");
-        } else if (id == R.id.nav_share) {
-            // go to different activity
-        } else if (id == R.id.nav_send) {
-            // go to different activity
+        switch (item.getItemId()){
+            case R.id.nav_camara:
+                break;
+            case R.id.nav_gallery:
+                break;
+            case R.id.nav_slideshow:
+                break;
+            case R.id.nav_manage:
+                break;
+            default:
+                int id = item.getItemId();
+                if (id == R.id.nav_share) {
+                    // go to different activity
+                } else if (id == R.id.nav_send) {
+                    // go to different activity
+                }
         }
 
-
-
-        fragment.setArguments(args);
-
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
+        //NavigationView nav = (NavigationView) findViewById(R.id.nav_view);
+        //nav.setCheckedItem(item.getItemId());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        NavigationView nav = (NavigationView) findViewById(R.id.nav_view);
-        nav.setCheckedItem(item.getItemId());
-
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -137,6 +173,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         public MainFragment() {
             // Empty constructor required for fragment subclasses
+
+
+            /*ArticleFragment articleFrag = (ArticleFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.article_fragment);
+            articleFrag.updateArticleView(position);*/
         }
 
         @Override

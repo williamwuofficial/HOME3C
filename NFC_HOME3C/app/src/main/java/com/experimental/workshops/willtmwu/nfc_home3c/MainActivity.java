@@ -2,6 +2,7 @@ package com.experimental.workshops.willtmwu.nfc_home3c;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.ListFragment;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -71,10 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (savedInstanceState == null){
             Fragment fragment = new MainFragment();
-            Bundle args = new Bundle();
-            args.putString(MainFragment.ARG_PLANET_NUMBER, "Main");
-
-            fragment.setArguments(args);
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
             navigationView.setCheckedItem(0);
@@ -139,37 +136,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
+        FragmentManager fragmentManager = getFragmentManager();
+        NavigationView nav = (NavigationView) findViewById(R.id.nav_view);
+
+
         switch (item.getItemId()){
-            case R.id.nav_camara:
+            case R.id.nav_scan:
+                Fragment mainFragment = new MainFragment();
+
+                //Bundle args = new Bundle();
+                //args.putString(MainFragment.ARG_PLANET_NUMBER, "Main");
+                //mainFragment.setArguments(args);
+
+                fragmentManager.beginTransaction().replace(R.id.content_frame, mainFragment).commit();
+                nav.setCheckedItem(item.getItemId());
                 break;
-            case R.id.nav_gallery:
-                break;
-            case R.id.nav_slideshow:
-                break;
-            case R.id.nav_manage:
+            case R.id.nav_recent:
+
+                Fragment recentFragment = new RecentFragment();
+
+                fragmentManager.beginTransaction().replace(R.id.content_frame, recentFragment).commit();
+                nav.setCheckedItem(item.getItemId());
                 break;
             default:
                 int id = item.getItemId();
-                if (id == R.id.nav_share) {
-                    // go to different activity
-                } else if (id == R.id.nav_send) {
-                    // go to different activity
+                if (id == R.id.nav_settings) {
+                    // start the SettingsActivity
+                } else if (id == R.id.nav_share) {
+                    // setup to call system
                 }
         }
-
-        //NavigationView nav = (NavigationView) findViewById(R.id.nav_view);
-        //nav.setCheckedItem(item.getItemId());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
     public static class MainFragment extends Fragment {
-        public static final String ARG_PLANET_NUMBER = "planet_number";
+        //public static final String ARG_PLANET_NUMBER = "planet_number";
 
         public MainFragment() {
             // Empty constructor required for fragment subclasses
@@ -185,13 +190,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             //int i = getArguments().getInt(ARG_PLANET_NUMBER);
-            String s = getArguments().getString(ARG_PLANET_NUMBER);
+            //String s = getArguments().getString(ARG_PLANET_NUMBER);
 
-            if(s==null){
+            /*if(s==null){
                 s = "";
             }
             ((TextView) rootView.findViewById(R.id.textView)).setText(s + "Fragment Loaded");
-            getActivity().setTitle(s + " Fragment");
+            getActivity().setTitle(s + " Fragment");*/
+            return rootView;
+        }
+    }
+
+    public static class RecentFragment extends ListFragment {
+        public static final String ARG_PLANET_NUMBER = "planet_number";
+
+        public RecentFragment() {
+            // Empty constructor required for fragment subclasses
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_recent, container, false);
             return rootView;
         }
     }
